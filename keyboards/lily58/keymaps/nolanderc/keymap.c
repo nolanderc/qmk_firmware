@@ -1,5 +1,12 @@
 #include QMK_KEYBOARD_H
 
+enum custom_keycodes {
+    KC_U8 = SAFE_RANGE,
+    KC_U16,
+    KC_U32,
+    KC_U64,
+};
+
 enum layer_number {
     _DVORAK = 0,
     _QWERTY,
@@ -14,7 +21,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             KC_LGUI,  KC_1,      KC_2,    KC_3,    KC_4,    KC_5,                     KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSPC,
             KC_TAB,   KC_QUOT,   KC_COMM, KC_DOT,  KC_P,    KC_Y,                     KC_F,    KC_G,    KC_C,    KC_R,    KC_L,    KC_SLSH,
             KC_ESC,   KC_A,      KC_O,    KC_E,    KC_U,    KC_I,                     KC_D,    KC_H,    KC_T,    KC_N,    KC_S,    KC_MINS,
-            KC_LCTL,  KC_SCLN,   KC_Q,    KC_J,    KC_K,    KC_X, KC_MPLY,  KC_MPLY,  KC_B,    KC_M,    KC_W,    KC_V,    KC_Z,    KC_BSLS,
+            KC_LCTL,  KC_SCLN,   KC_Q,    KC_J,    KC_K,    KC_X, QK_REBOOT,QK_REBOOT,KC_B,    KC_M,    KC_W,    KC_V,    KC_Z,    KC_BSLS,
                                MO(_RAISE), KC_LALT, KC_LSFT,  MO(_LOWER),        KC_ENTER, KC_SPC, MO(_RAISE), KC_RALT
             ),
 
@@ -28,26 +35,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_LOWER] = LAYOUT(
         TG(_QWERTY), _______, _______, _______, _______, _______,                      _______, _______, _______, _______, _______,   KC_DELETE,
-            KC_F1,   KC_DQUO, KC_7,    KC_8,    KC_9,    KC_AT,                        KC_PIPE, KC_AMPR, KC_LBRC, KC_RBRC, KC_PERC,   KC_SLSH,
-            KC_GRV,  KC_0,    KC_4,    KC_5,    KC_6,    KC_EXLM,                      KC_ASTR, KC_EQUAL,KC_LPRN, KC_RPRN, S(KC_S),   KC_TILD,
-            _______, KC_LT,   KC_1,    KC_2,    KC_3,    KC_GT,   _______,    _______, KC_CIRC, KC_PLUS, KC_LCBR, KC_RCBR, KC_DOLLAR, KC_HASH,
+            _______, KC_GRV,  KC_LT,   KC_GT,   KC_PIPE, KC_AT,                        KC_PIPE, KC_AMPR, KC_LBRC, KC_RBRC, KC_PERC,   KC_SLSH,
+            _______, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                      KC_ASTR, KC_EQUAL,KC_LPRN, KC_RPRN, S(KC_S),   KC_TILD,
+            _______, KC_COLON,KC_2,    KC_1,    KC_0,    KC_CIRC, _______,    _______, KC_HASH, KC_PLUS, KC_LCBR, KC_RCBR, KC_DOLLAR, KC_CIRC,
                                  _______, _______, _______, _______,               KC_BSPC,  _______, _______, _______
             ),
 
     [_RAISE] = LAYOUT(
-            _______, _______, _______, _______, _______, _______,                     _______, _______, _______, _______, _______, KC_PRINT_SCREEN,
-            KC_GRV,  G(KC_1), G(KC_2), G(KC_3), G(KC_4), G(KC_5),                 KC_6, LAG(KC_LEFT),G(KC_DOWN),G(KC_UP),LAG(KC_RGHT), _______,
-            KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,                       XXXXXXX, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, XXXXXXX,
-            KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,   _______, _______,  KC_PLUS, KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, KC_BSLS,
-            _______, _______, _______,  _______, _______,  _______, _______, _______
+            _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                       KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10, KC_PRINT_SCREEN,
+            _______, _______, KC_PGDN, KC_UP,   KC_PGUP, KC_F11,                      KC_F12,  _______, _______, _______, _______, _______,
+            _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, S(C(KC_TAB)),              C(KC_TAB), KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______,
+            _______, _______, _______, KC_DOWN, KC_UP,   _______,  _______, _______,  _______, _______, _______, _______, _______, _______,
+                                _______, _______, _______,  _______,            _______,  _______, _______, _______
             ),
 
     [_ADJUST] = LAYOUT(
+            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_REBOOT,
             XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
             XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-            _______, _______, _______, _______, _______,  _______, _______, _______
+            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+                                _______, _______, _______,  _______,            _______,  _______, _______, _______
             )
 };
 
@@ -97,6 +104,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef OLED_ENABLE
         set_keylog(keycode, record);
 #endif
+
+        switch (keycode) {
+            case KC_U8: SEND_STRING("u8"); break;
+            case KC_U16: SEND_STRING("u16"); break;
+            case KC_U32: SEND_STRING("u32"); break;
+            case KC_U64: SEND_STRING("u64"); break;
+            default: break;
+        }
     }
     return true;
 }
