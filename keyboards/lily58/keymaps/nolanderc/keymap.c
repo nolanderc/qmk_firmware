@@ -1,10 +1,10 @@
 #include QMK_KEYBOARD_H
 
 enum custom_keycodes {
-    KC_U8 = SAFE_RANGE,
-    KC_U16,
-    KC_U32,
-    KC_U64,
+    // Swedish symbols Ö, Ä and Å.
+    KC_ODOTS = SAFE_RANGE,
+    KC_ADOTS,
+    KC_ARING,
 };
 
 enum layer_number {
@@ -35,17 +35,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_LOWER] = LAYOUT(
         TG(_QWERTY), _______, _______, _______, _______, _______,                      _______, _______, _______, _______, _______,   KC_DELETE,
-            _______, KC_GRV,  KC_LT,   KC_GT,   KC_PIPE, KC_AT,                        KC_PIPE, KC_AMPR, KC_LBRC, KC_RBRC, KC_PERC,   KC_SLSH,
-            _______, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                      KC_ASTR, KC_EQUAL,KC_LPRN, KC_RPRN, S(KC_S),   KC_TILD,
+            _______, KC_GRV,  KC_LT,   KC_GT,   KC_PIPE, KC_CIRC,                      KC_PIPE, KC_AMPR, KC_LBRC, KC_RBRC, KC_PERC,   KC_TILD,
+            _______, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                      KC_ASTR, KC_EQUAL,KC_LPRN, KC_RPRN, S(KC_S),   S(KC_MINS),
             _______, KC_COLON,KC_2,    KC_1,    KC_0,    KC_CIRC, _______,    _______, KC_HASH, KC_PLUS, KC_LCBR, KC_RCBR, KC_DOLLAR, KC_CIRC,
                                  _______, _______, _______, _______,               KC_BSPC,  _______, _______, _______
             ),
 
     [_RAISE] = LAYOUT(
             _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                       KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10, KC_PRINT_SCREEN,
-            _______, _______, KC_PGDN, KC_UP,   KC_PGUP, KC_F11,                      KC_F12,  _______, _______, _______, _______, _______,
-            _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, S(C(KC_TAB)),              C(KC_TAB), KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______,
-            _______, _______, _______, KC_DOWN, KC_UP,   _______,  _______, _______,  _______, _______, _______, _______, _______, _______,
+            _______, KC_ARING,KC_PGDN, KC_UP,   KC_PGUP, KC_F11,                      KC_F12,  _______, _______, _______, _______, _______,
+            _______, KC_ADOTS,KC_LEFT, KC_DOWN, KC_RGHT, S(C(KC_TAB)),              C(KC_TAB), KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______,
+            _______, KC_ODOTS,KC_ODOTS,KC_DOWN, KC_UP,   _______,  _______, _______,  _______, _______, _______, _______, _______, _______,
                                 _______, _______, _______,  _______,            _______,  _______, _______, _______
             ),
 
@@ -83,10 +83,23 @@ const char *read_keylogs(void);
 // void set_timelog(void);
 // const char *read_timelog(void);
 
+const char* get_host_os_name(void) {
+    switch (detected_host_os()) {
+        case OS_LINUX: return "Linux";
+        case OS_WINDOWS: return "Windows";
+        case OS_MACOS: return "MacOS";
+        case OS_IOS: return "iOS";
+        case OS_UNSURE:
+        default:
+            return "?";
+    }
+}
+
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         // If you want to change the display of OLED, you need to change here
         oled_write_ln(read_layer_state(), false);
+        oled_write("OS: ", false); oled_write_ln(get_host_os_name(), false);
         oled_write_ln(read_keylog(), false);
         oled_write_ln(read_keylogs(), false);
         //oled_write_ln(read_mode_icon(keymap_config.swap_lalt_lgui), false);
@@ -99,21 +112,32 @@ bool oled_task_user(void) {
 }
 #endif // OLED_ENABLE
 
+void send_key(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed) {
+        register_code16(keycode);
+    } else {
+        unregister_code16(keycode);
+    }
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
 #ifdef OLED_ENABLE
         set_keylog(keycode, record);
 #endif
-
-        switch (keycode) {
-            case KC_U8: SEND_STRING("u8"); break;
-            case KC_U16: SEND_STRING("u16"); break;
-            case KC_U32: SEND_STRING("u32"); break;
-            case KC_U64: SEND_STRING("u64"); break;
-            default: break;
-        }
     }
-    return true;
+
+    switch (keycode) {
+        // Assumes a `se(us)` layout in XKB which maps AltGr + <key> to the
+        // corresponding symbol on a Swedish ISO keyboard.
+        // On Windows, the keys seem to be different in the US International layout, so
+        // will need fixing.
+        case KC_ODOTS: send_key(ALGR(KC_SCLN), record); return false;
+        case KC_ADOTS: send_key(ALGR(KC_QUOT), record); return false;
+        case KC_ARING: send_key(ALGR(KC_LBRC), record); return false;
+
+        default: return true;
+    }
 }
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
